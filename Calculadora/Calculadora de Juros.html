@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Calculadora de Juros</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light;--bg:#f6faff;--bg2:#f1f9ee;--ink:#1b3563;--mu:#55688a;--onacc:#0e2247;--card:#fff;--bd:#dbe3ef;--lcd:#e6f3dc;--lcdink:#12264a;--blue:#1b3563;--blued:#1b3563;--acc:#50aa2e;--accd:#3b8721;--key:#eef2f9;--keyd:#d3dcea;--op:#cfd9ec;--opd:#b3c2de;--chip:#f2f5fa;--ok:#2f7a1a;--calc:linear-gradient(160deg,#24437d,#1b3563 60%,#142a4f);--hero:linear-gradient(135deg,#142a4f 0%,#1b3563 55%,#50aa2e 145%);--shadow:rgba(27,53,99,.3);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#061626;--bg2:#08241f;--ink:#e4f1f7;--mu:#8fa9bb;--card:#0e2740;--bd:#1e3f5c;--lcd:#0f2b24;--lcdink:#b6f2d3;--blue:#5aa2f2;--key:#1c3d5e;--keyd:#112c47;--op:#26507a;--opd:#183a5c;--chip:#15324d;--acc:#2ed18f;--accd:#1c9c68;--ok:#5fe0a3;--calc:linear-gradient(160deg,#10315c,#0a1f3d);--hero:linear-gradient(135deg,#0c2f5e 0%,#12508f 55%,#138a62 130%);--shadow:rgba(0,0,0,.5)}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#061626;--bg2:#08241f;--ink:#e4f1f7;--mu:#8fa9bb;--card:#0e2740;--bd:#1e3f5c;--lcd:#0f2b24;--lcdink:#b6f2d3;--blue:#5aa2f2;--key:#1c3d5e;--keyd:#112c47;--op:#26507a;--opd:#183a5c;--chip:#15324d;--acc:#2ed18f;--accd:#1c9c68;--ok:#5fe0a3;--calc:linear-gradient(160deg,#10315c,#0a1f3d);--hero:linear-gradient(135deg,#0c2f5e 0%,#12508f 55%,#138a62 130%);--shadow:rgba(0,0,0,.5)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--acc:#6fd44b;--accd:#3f9a26;--lcd:#12301a;--lcdink:#c8f5b0;--ok:#8fe06a;--hero:linear-gradient(135deg,#0c2f5e 0%,#12508f 55%,#2f8f1f 135%)}}
+:root[data-theme="dark"]{--acc:#6fd44b;--accd:#3f9a26;--lcd:#12301a;--lcdink:#c8f5b0;--ok:#8fe06a;--hero:linear-gradient(135deg,#0c2f5e 0%,#12508f 55%,#2f8f1f 135%)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*{box-sizing:border-box}
+body{margin:0;min-height:100%;background:linear-gradient(170deg,var(--bg) 40%,var(--bg2));background-attachment:fixed;color:var(--ink);font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.4}
+.mono{font-family:"DM Mono",ui-monospace,Menlo,Consolas,monospace}
+[hidden]{display:none!important}
+
+#welcome{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px 20px;background:radial-gradient(55% 50% at 88% 22%,rgba(80,170,46,.18),transparent 70%),radial-gradient(50% 50% at 8% 92%,rgba(27,53,99,.12),transparent 70%);transition:opacity .45s ease,transform .45s ease}
+#welcome.out{opacity:0;transform:translateY(-18px)}
+.wrap{display:grid;gap:36px;align-items:center;max-width:920px;width:100%}
+@media(min-width:820px){.wrap{grid-template-columns:1.05fr .95fr;gap:64px}}
+h1{font-size:clamp(2.4rem,7vw,3.9rem);line-height:1.02;margin:0 0 16px;font-weight:800;letter-spacing:-.025em;color:var(--blued)}
+:root[data-theme="dark"] h1{color:var(--ink)}
+.lead{color:var(--mu);font-size:1.12rem;max-width:34ch;margin:0 0 28px}
+.btn{font:inherit;font-weight:700;font-size:1.1rem;color:var(--onacc);background:var(--acc);border:0;border-radius:14px;padding:15px 38px;cursor:pointer;box-shadow:0 5px 0 var(--accd);transition:transform .08s,box-shadow .08s}
+:root[data-theme="dark"] .btn{color:#04281b}
+.btn:hover{filter:brightness(1.08)}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--accd)}
+.theme{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));right:14px;z-index:20;width:42px;height:42px;border-radius:50%;border:1px solid var(--bd);background:var(--card);color:var(--ink);font-size:1.2rem;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.btn:focus-visible,button:focus-visible,summary:focus-visible,a:focus-visible{outline:3px solid var(--acc);outline-offset:3px}
+
+.calc{width:min(310px,82vw);margin:0 auto;background:var(--calc);border-radius:28px;padding:18px 18px 16px;border-bottom:14px solid var(--acc);box-shadow:0 28px 50px -18px var(--shadow);transform:rotate(-3deg)}
+.lcd{background:var(--lcd);border-radius:14px;padding:10px 14px 12px;height:96px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:inset 0 3px 8px rgba(10,39,72,.25);color:var(--lcdink)}
+.lcd .lb{font-size:.78rem;min-height:1.1em;opacity:.7}
+.lcd .nm{font-size:1.9rem;text-align:right;white-space:nowrap;overflow:hidden;font-weight:500;letter-spacing:-.02em}
+.keys{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}
+.keys i{font-style:normal;font-weight:700;font-size:1.15rem;text-align:center;padding:13px 0;border-radius:12px;background:var(--key);color:var(--ink);box-shadow:0 3px 0 var(--keyd);transition:transform .09s,box-shadow .09s,background .09s;user-select:none}
+.keys i.op{background:var(--op)}
+.keys i.pc{background:var(--acc);color:var(--onacc);box-shadow:0 3px 0 var(--accd)}
+.keys i.on{transform:translateY(3px);box-shadow:0 0 0 transparent}
+
+#app{max-width:560px;margin:0 auto;padding:22px 16px 44px;animation:in .45s ease both}
+@keyframes in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.top{padding-right:52px;display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.top h2{margin:0;font-size:1.3rem;font-weight:800;letter-spacing:-.01em}
+.top a{color:var(--mu);font-size:.9rem;text-decoration:none;border-bottom:1px solid var(--bd)}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:16px;margin-bottom:14px}
+.inputs{display:grid;grid-template-columns:2fr 1fr;gap:12px}
+label{display:block;font-size:.8rem;color:var(--mu);margin-bottom:5px}
+input{width:100%;padding:12px;font:500 1.15rem "DM Mono",ui-monospace,monospace;border:1px solid var(--bd);border-radius:10px;background:var(--lcd);color:var(--lcdink)}
+input:focus{outline:3px solid var(--acc);border-color:transparent}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.chip{font:inherit;font-size:.85rem;font-weight:700;color:var(--ink);background:var(--chip);border:1px solid var(--bd);border-radius:999px;padding:6px 14px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff}
+:root[data-theme="dark"] .chip[aria-pressed="true"]{color:#04182e}
+
+.hero{background:var(--hero);color:#fff;border-radius:16px;padding:16px 18px;margin-bottom:14px;box-shadow:0 14px 26px -16px var(--shadow)}
+.hero .t{font-size:.85rem;opacity:.85}
+.hero .big{font:500 2rem "DM Mono",ui-monospace,monospace;letter-spacing:-.02em;margin:2px 0}
+.hero .eco{font-size:.85rem;opacity:.95}
+.hero .eco b{color:#d2f7b8}
+
+.res{padding:14px 0;border-bottom:1px solid var(--bd)}
+.res:last-child{border-bottom:0;padding-bottom:2px}
+.rt{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.res .n{font-weight:700;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tag{font-size:.7rem;font-weight:700;color:var(--onacc);background:var(--acc);border-radius:999px;padding:2px 9px}
+:root[data-theme="dark"] .tag{color:#04281b}
+.res .s{font-size:.78rem;color:var(--mu);max-width:26ch}
+.res .v{font:500 1.3rem "DM Mono",ui-monospace,monospace;text-align:right}
+.res .p{font-size:.85rem;color:var(--blue);font-weight:700;text-align:right}
+.res .j{font-size:.75rem;color:var(--mu);text-align:right}
+.bar{height:6px;border-radius:99px;background:var(--chip);margin-top:10px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--blue),var(--acc));transition:width .35s ease}
+
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+.sec{flex:1;font:inherit;font-weight:700;font-size:.95rem;color:var(--ink);background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;cursor:pointer}
+.sec.main{background:var(--blue);border-color:var(--blue);color:#fff}
+:root[data-theme="dark"] .sec.main{color:#04182e}
+.sec.ok{background:var(--acc);border-color:var(--acc);color:var(--onacc)}
+details.card summary{cursor:pointer;font-weight:700;list-style-position:inside}
+.cfg{display:grid;grid-template-columns:1fr 110px;gap:10px 12px;align-items:center;margin-top:14px}
+.cfg label{margin:0;font-size:.9rem}
+.cfg input{padding:8px 10px;font-size:1rem;text-align:right}
+.hint{font-size:.78rem;color:var(--mu);margin:12px 0 0}
+#app{display:flex;flex-direction:column}
+.col{display:contents}
+.o1{order:1}.o2{order:2}.o3{order:3}.o4{order:4}.o5{order:5}.o6{order:6}
+#comp h3{margin:0 0 10px;font-size:1rem}
+.ct{width:100%;border-collapse:collapse;font-size:.82rem;min-width:430px}
+.ct th{font-weight:500;color:var(--mu);text-align:right;padding:6px 6px;font-size:.76rem}
+.ct td{text-align:right;padding:9px 6px;border-top:1px solid var(--bd);font-family:"DM Mono",ui-monospace,monospace;white-space:nowrap}
+.ct th:first-child,.ct td:first-child{text-align:left;font-weight:700}
+.ct tr.on td{background:var(--chip);color:var(--blue)}
+@media(min-width:900px){
+#app{max-width:1060px;display:grid;grid-template-columns:400px 1fr;column-gap:24px;align-items:start;padding-top:34px}
+.col{display:block}
+.top{grid-column:1/-1;padding-right:0}
+#lista{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px}
+#lista .res{border:1px solid var(--bd);border-radius:14px;padding:14px;background:var(--chip)}
+#lista .rt{flex-direction:column;gap:10px}
+#lista .res .v,#lista .res .p,#lista .res .j{text-align:left}
+#lista .res .v{font-size:1.5rem}
+#lista .res .s{max-width:none}
+.empty{display:block}
+}
+.empty{display:none;color:var(--mu);border:1px dashed var(--bd);border-radius:16px;padding:48px 20px;text-align:center}
+#nome{font-family:inherit;font-size:1rem}
+.feat{list-style:none;margin:34px 0 0;padding:0;display:grid;gap:12px;font-size:.98rem}
+.feat li{display:flex;gap:11px;align-items:center}
+.feat li::before{content:"";flex:none;width:20px;height:20px;border-radius:50%;background:var(--acc) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 6.2l2.4 2.4 4.6-5' fill='none' stroke='%230e2247' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/12px no-repeat}
+.addb{display:block;width:100%;margin-top:14px;background:var(--acc);border-color:var(--acc);color:var(--onacc)}
+#itens h3{margin:0 0 6px;font-size:1rem}
+.it{padding:12px 0;border-top:1px solid var(--bd)}
+.ith{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.rm{font:inherit;font-size:1.2rem;line-height:1;width:30px;height:30px;border-radius:50%;border:1px solid var(--bd);background:var(--chip);color:var(--mu);cursor:pointer}
+.itp{font-size:.82rem;color:var(--mu);margin:2px 0 8px}
+.itp b{color:var(--ink)}
+.itg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.itg div{background:var(--chip);border-radius:10px;padding:8px 10px;display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:.8rem}
+.itg span{color:var(--mu)}
+.itg b{font:500 .9rem "DM Mono",ui-monospace,monospace}
+.tot{margin-top:6px;padding:12px;border-radius:12px;background:var(--hero);color:#fff}
+.tot .tt{font-weight:700;margin-bottom:8px}
+.tot .itg div{background:rgba(255,255,255,.14)}
+.tot .itg span{color:rgba(255,255,255,.8)}
+@media(prefers-reduced-motion:reduce){#welcome,#app,.keys i,.btn,.bar i{transition:none;animation:none}}
+</style>
+</head>
+<body>
+
+<button class="theme" id="tema" type="button" aria-label="Alternar tema claro ou escuro">☾</button>
+
+<section id="welcome">
+  <div class="wrap">
+    <div>
+      <h1>Calculadora de juros</h1>
+      <p class="lead">Digite o valor no Pix, aplique o desconto e veja quanto fica no crédito e no boleto.</p>
+      <button class="btn" id="iniciar" type="button">Começar</button>
+      <ul class="feat">
+        <li>Desconto em porcentagem, com atalhos prontos</li>
+        <li>Crédito até 8x e boleto até 4x</li>
+        <li>Vários produtos no mesmo pedido</li>
+        <li>Resumo pronto para copiar e enviar</li>
+      </ul>
+    </div>
+    <div class="calc" aria-hidden="true">
+      <div class="lcd mono"><div class="lb" id="lb"></div><div class="nm" id="nm">0</div></div>
+      <div class="keys" id="keys">
+        <i data-k="7">7</i><i data-k="8">8</i><i data-k="9">9</i><i class="pc" data-k="%">%</i>
+        <i data-k="4">4</i><i data-k="5">5</i><i data-k="6">6</i><i class="op" data-k="x">×</i>
+        <i data-k="1">1</i><i data-k="2">2</i><i data-k="3">3</i><i class="op" data-k="-">−</i>
+        <i data-k="0">0</i><i data-k=",">,</i><i class="op" data-k="=">=</i><i class="op" data-k="+">+</i>
+      </div>
+    </div>
+  </div>
+</section>
+
+<main id="app" hidden>
+  <div class="top"><h2>Calculadora de juros</h2><a href="#inicio" id="voltar">Início</a></div>
+
+  <div class="col">
+  <div class="card o1">
+    <div style="margin-bottom:12px"><label for="nome">Nome do produto (opcional)</label><input id="nome" type="text" placeholder="Ex.: Tênis azul" autocomplete="off"></div>
+    <div class="inputs">
+      <div><label for="valor">Valor do produto no Pix (R$)</label>
+        <input id="valor" type="text" inputmode="numeric" placeholder="0,00" autocomplete="off"></div>
+      <div><label for="desc">Desconto (%)</label>
+        <input id="desc" type="text" inputmode="decimal" placeholder="0" autocomplete="off"></div>
+    </div>
+    <div class="chips" id="chips" role="group" aria-label="Descontos rápidos"></div>
+    <button class="sec addb" id="add" type="button">+ Adicionar produto</button>
+  </div>
+
+  <div class="hero o2" id="baseRow" hidden>
+    <div class="t">Pix com desconto</div>
+    <div class="big" id="base"></div>
+    <div class="eco" id="eco"></div>
+  </div>
+
+  <div class="actions o5">
+    <button class="sec main" id="copiar" type="button">Copiar resumo</button>
+    <button class="sec" id="limpar" type="button">Limpar</button>
+  </div>
+
+  <details class="card o6">
+    <summary>Ajustar taxas</summary>
+    <div class="cfg" id="cfg"></div>
+    <p class="hint">As taxas ficam salvas neste aparelho. O percentual final de cada opção é a taxa mais a margem de segurança.</p>
+  </details>
+  </div>
+  <div class="col">
+  <div class="card o3" id="lista" aria-live="polite"></div>
+  <div class="card o3" id="itens" hidden></div>
+  <div class="empty" id="vazio">Digite o valor do produto para ver as parcelas.</div>
+  </div>
+</main>
+
+<script>
+/* ---- animação da calculadora ---- */
+var STEPS=[["2","2"],["1","21"],["5","215"],["7","2.157"],[",","2.157,"],["3","2.157,3"],["2","2.157,32"],["%","2.213,63","Crédito 3x"],["=","2.213,63","Crédito 3x"]];
+var nm=document.getElementById("nm"),lb=document.getElementById("lb"),keys=document.getElementById("keys");
+var reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+var si=0,timer=null;
+function press(k){var el=keys.querySelector('[data-k="'+k+'"]');if(!el)return;el.classList.add("on");setTimeout(function(){el.classList.remove("on")},170)}
+function tick(){
+  if(si>=STEPS.length){si=0;nm.textContent="0";lb.textContent="";timer=setTimeout(tick,900);return}
+  var s=STEPS[si++];press(s[0]);
+  setTimeout(function(){nm.textContent=s[1];lb.textContent=s[2]||"Pix"},90);
+  timer=setTimeout(tick,si===STEPS.length?2200:(si===8?700:430));
+}
+if(reduce){nm.textContent="2.213,63";lb.textContent="Crédito 3x"}else{timer=setTimeout(tick,700)}
+
+/* ---- navegação ---- */
+var welcome=document.getElementById("welcome"),app=document.getElementById("app");
+function mostra(){
+  var c=location.hash==="#calculadora";
+  welcome.hidden=c;app.hidden=!c;welcome.classList.remove("out");
+  clearTimeout(timer);
+  if(c){document.getElementById("valor").focus({preventScroll:true})}
+  else if(!reduce){si=0;timer=setTimeout(tick,500)}
+}
+document.getElementById("iniciar").addEventListener("click",function(){
+  welcome.classList.add("out");setTimeout(function(){location.hash="calculadora"},reduce?0:380);
+});
+window.addEventListener("hashchange",mostra);
+
+/* ---- dados e ajustes ---- */
+var CONDS=[
+  {nome:"Crédito 3x",taxa:2.11,n:3},
+  {nome:"Crédito 8x",taxa:7.5,n:8},
+  {nome:"Boleto 1x",taxa:2.11,n:1},
+  {nome:"Boleto 4x",taxa:7.5,n:4}
+];
+var cfg={margem:0.5,taxas:CONDS.map(function(c){return c.taxa})};
+try{var sv=JSON.parse(localStorage.getItem("juros-cfg")||"null");
+  if(sv&&typeof sv.margem==="number"&&sv.taxas&&sv.taxas.length===CONDS.length)cfg=sv}catch(e){}
+function salva(){try{localStorage.setItem("juros-cfg",JSON.stringify(cfg))}catch(e){}}
+
+function num(s){s=String(s==null?"":s).trim();if(s.indexOf(",")>-1)s=s.replace(/\./g,"").replace(",",".");var x=parseFloat(s);return isNaN(x)?0:x}
+function fmt(x,d){return x.toLocaleString("pt-BR",{minimumFractionDigits:d,maximumFractionDigits:d})}
+function brl(x){return x.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}
+
+var valor=document.getElementById("valor"),desc=document.getElementById("desc"),lista=document.getElementById("lista");
+var cents=0,last=[];
+function loadItens(){try{var a=JSON.parse(localStorage.getItem("juros-itens")||"[]");return Array.isArray(a)?a.filter(function(x){return x&&typeof x.cents==="number"&&typeof x.d==="number"&&x.cents>0}).map(function(x){return{nome:String(x.nome||"").slice(0,60),cents:x.cents,d:Math.min(Math.max(x.d,0),100)}}):[]}catch(e){return[]}}
+function saveItens(){try{localStorage.setItem("juros-itens",JSON.stringify(items))}catch(e){}}
+var items=loadItens(),nomeEl=document.getElementById("nome"),itensEl=document.getElementById("itens");
+function curD(){return Math.min(Math.max(num(desc.value),0),100)}
+function esc(s){return s.replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function calcItem(it){var b=it.cents/100*(1-it.d/100);return{base:b,t:CONDS.map(function(c,i){return b*(1+(cfg.taxas[i]+cfg.margem)/100)})}}
+function linha(k,x){var c=CONDS[k];return "\n"+c.nome+": "+brl(x)+(c.n>1?" ("+c.n+"x de "+brl(x/c.n)+")":"")}
+function renderItens(){
+  document.getElementById("vazio").hidden=items.length>0||cents>0;
+  itensEl.hidden=!items.length;
+  if(!items.length){itensEl.innerHTML="";return}
+  var tot=0,sums=CONDS.map(function(){return 0}),h='<h3>Produtos adicionados</h3>';
+  items.forEach(function(it,i){
+    var r=calcItem(it);tot+=r.base;
+    h+='<div class="it"><div class="ith"><b>'+esc(it.nome||"Produto "+(i+1))+'</b><button class="rm" type="button" data-rm="'+i+'" aria-label="Remover produto">×</button></div><div class="itp">Pix '+brl(it.cents/100)+(it.d?' → <b>'+brl(r.base)+'</b> com '+fmt(it.d,2)+'% de desconto':' sem desconto')+'</div><div class="itg">';
+    r.t.forEach(function(x,k){sums[k]+=x;h+='<div><span>'+CONDS[k].nome+'</span><b>'+brl(x)+'</b></div>'});
+    h+='</div></div>';
+  });
+  h+='<div class="tot"><div class="tt">Total do pedido ('+items.length+(items.length>1?' produtos':' produto')+')</div><div class="itg"><div><span>Pix</span><b>'+brl(tot)+'</b></div>';
+  sums.forEach(function(x,k){h+='<div><span>'+CONDS[k].nome+'</span><b>'+brl(x)+'</b></div>'});
+  itensEl.innerHTML=h+'</div></div>';
+}
+function resumoMulti(){
+  var all=items.slice();if(cents)all.push({nome:nomeEl.value.trim(),cents:cents,d:curD()});
+  var out=[],tot=0,sums=CONDS.map(function(){return 0});
+  all.forEach(function(it,i){var r=calcItem(it);tot+=r.base;
+    var s=(it.nome||"Produto "+(i+1))+(it.d?" (desconto de "+fmt(it.d,2)+"%)":"")+"\nPix: "+brl(r.base);
+    r.t.forEach(function(x,k){sums[k]+=x;s+=linha(k,x)});out.push(s)});
+  var s="TOTAL ("+all.length+(all.length>1?" produtos":" produto")+")\nPix: "+brl(tot);
+  sums.forEach(function(x,k){s+=linha(k,x)});out.push(s);return out.join("\n\n");
+}
+[valor,desc,nomeEl].forEach(function(el){el.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();document.getElementById("add").click()}})});
+itensEl.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("[data-rm]");if(!b)return;items.splice(+b.dataset.rm,1);saveItens();renderItens()});
+document.getElementById("add").addEventListener("click",function(){
+  if(!cents){valor.focus();return}
+  items.push({nome:nomeEl.value.trim(),cents:cents,d:curD()});saveItens();
+  cents=0;valor.value="";nomeEl.value="";desc.value="";calc();valor.focus();
+});
+
+/* ---- lista de resultados ---- */
+lista.innerHTML=CONDS.map(function(c,i){
+  return '<div class="res"><div class="rt"><div><div class="n">'+c.nome+'<span class="tag" id="g'+i+'" hidden>Menor custo</span></div><div class="s" id="s'+i+'"></div></div>'+
+  '<div><div class="v" id="v'+i+'"></div><div class="p" id="p'+i+'"></div><div class="j" id="j'+i+'"></div></div></div>'+
+  '<div class="bar"><i id="b'+i+'"></i></div></div>';
+}).join("");
+
+function calc(){
+  var v=cents/100,d=Math.min(Math.max(num(desc.value),0),100),base=v*(1-d/100);
+  document.getElementById("baseRow").hidden=!(v>0);
+  lista.hidden=!(v>0);
+  document.getElementById("base").textContent=brl(base);
+  document.getElementById("eco").innerHTML=d>0?'Você economiza <b>'+brl(v-base)+'</b> ('+fmt(d,2)+'% de desconto)':'Sem desconto aplicado';
+  last=[];
+  var ts=CONDS.map(function(c,i){return cfg.taxas[i]+cfg.margem}),mx=Math.max.apply(null,ts)||1,mn=Math.min.apply(null,ts);
+  CONDS.forEach(function(c,i){
+    var t=ts[i],total=base*(1+t/100);
+    document.getElementById("s"+i).textContent="+"+fmt(t,2)+"% sobre o Pix (inclui margem de "+fmt(cfg.margem,2)+"%)";
+    document.getElementById("v"+i).textContent=brl(total);
+    document.getElementById("p"+i).textContent=c.n>1?c.n+"x de "+brl(total/c.n):"à vista";
+    document.getElementById("j"+i).textContent=v>0?"juros: "+brl(total-base):"";
+    document.getElementById("b"+i).style.width=Math.max(t/mx*100,4)+"%";
+    document.getElementById("g"+i).hidden=!(v>0&&t===mn);
+    last.push({nome:c.nome,total:total,n:c.n});
+  });
+  renderItens();
+  var d0=document.querySelectorAll("#chips .chip");
+  for(var k=0;k<d0.length;k++)d0[k].setAttribute("aria-pressed",String(num(d0[k].dataset.d)===d&&desc.value!==""));
+}
+
+/* ---- campo de valor com máscara (digita centavos) ---- */
+valor.addEventListener("input",function(){
+  var dg=valor.value.replace(/\D/g,"").slice(0,10);
+  cents=dg?parseInt(dg,10):0;
+  valor.value=cents?fmt(cents/100,2):"";
+  calc();
+});
+desc.addEventListener("input",calc);
+
+/* ---- descontos rápidos ---- */
+var chips=document.getElementById("chips");
+[0,5,7.99,11].forEach(function(p){
+  var b=document.createElement("button");b.type="button";b.className="chip";b.dataset.d=String(p);b.textContent=String(p).replace(".",",")+"%";
+  b.addEventListener("click",function(){desc.value=p?String(p).replace(".",","):"";calc()});
+  chips.appendChild(b);
+});
+
+/* ---- ajustes de taxas ---- */
+var cf=document.getElementById("cfg"),h='<label for="cm">Margem de segurança (%)</label><input id="cm" class="mono" inputmode="decimal" value="'+fmt(cfg.margem,2)+'">';
+CONDS.forEach(function(c,i){h+='<label for="ct'+i+'">'+c.nome+' (%)</label><input id="ct'+i+'" class="mono" inputmode="decimal" value="'+fmt(cfg.taxas[i],2)+'">'});
+cf.innerHTML=h;
+document.getElementById("cm").addEventListener("input",function(e){cfg.margem=Math.max(num(e.target.value),0);salva();calc()});
+CONDS.forEach(function(c,i){document.getElementById("ct"+i).addEventListener("input",function(e){cfg.taxas[i]=Math.max(num(e.target.value),0);salva();calc()})});
+
+/* ---- copiar resumo e limpar ---- */
+var bt=document.getElementById("copiar");
+function resumo(){
+  if(items.length)return resumoMulti();
+  var d=Math.min(Math.max(num(desc.value),0),100),base=cents/100*(1-d/100);
+  var t="Pix"+(d?" (com "+fmt(d,2)+"% de desconto)":"")+": "+brl(base);
+  last.forEach(function(r){t+="\n"+r.nome+": "+brl(r.total)+(r.n>1?" ("+r.n+"x de "+brl(r.total/r.n)+")":"")});
+  return t;
+}
+function feito(ok){bt.textContent=ok?"Copiado":"Não foi possível copiar";bt.classList.toggle("ok",ok);setTimeout(function(){bt.textContent="Copiar resumo";bt.classList.remove("ok")},1800)}
+bt.addEventListener("click",function(){
+  if(!cents&&!items.length){valor.focus();return}
+  var t=resumo();
+  function fb(){var a=document.createElement("textarea");a.value=t;a.style.position="fixed";a.style.opacity="0";document.body.appendChild(a);a.select();var ok=false;try{ok=document.execCommand("copy")}catch(e){}document.body.removeChild(a);feito(ok)}
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){feito(true)},fb)}else fb();
+});
+document.getElementById("limpar").addEventListener("click",function(){cents=0;items=[];saveItens();valor.value="";nomeEl.value="";desc.value="";calc();valor.focus()});
+
+/* ---- tema claro/escuro ---- */
+var root=document.documentElement,tb=document.getElementById("tema"),mq=window.matchMedia&&matchMedia("(prefers-color-scheme: dark)");
+function tema(t,save){root.setAttribute("data-theme",t);tb.textContent=t==="dark"?"☀":"☾";tb.setAttribute("aria-label",t==="dark"?"Mudar para tema claro":"Mudar para tema escuro");if(save){try{localStorage.setItem("juros-tema",t)}catch(e){}}}
+var ts0=null;try{ts0=localStorage.getItem("juros-tema")}catch(e){}
+tema(ts0||(mq&&mq.matches?"dark":"light"));
+tb.addEventListener("click",function(){tema(root.getAttribute("data-theme")==="dark"?"light":"dark",true)});
+
+calc();mostra();
+</script>
+</body>
+</html>
